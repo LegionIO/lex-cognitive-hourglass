@@ -49,7 +49,10 @@ module Legion
             blocked   = 0
 
             @hourglasses.each_value do |h|
-              next if h.state == :paused
+              if h.state == :paused
+                blocked += 1
+                next
+              end
 
               if h.expired?
                 expired += 1
@@ -93,16 +96,16 @@ module Legion
             grouped = @hourglasses.values.group_by(&:state)
 
             {
-              total:      @hourglasses.size,
-              grain_count: @grains.size,
-              flowing:    grouped.fetch(:flowing,  []).size,
-              blocked:    grouped.fetch(:blocked,  []).size,
-              empty:      grouped.fetch(:empty,    []).size,
-              full:       grouped.fetch(:full,     []).size,
-              paused:     grouped.fetch(:paused,   []).size,
+              total:         @hourglasses.size,
+              grain_count:   @grains.size,
+              flowing:       grouped.fetch(:flowing,  []).size,
+              blocked:       grouped.fetch(:blocked,  []).size,
+              empty:         grouped.fetch(:empty,    []).size,
+              full:          grouped.fetch(:full,     []).size,
+              paused:        grouped.fetch(:paused,   []).size,
               most_urgent:   most_urgent&.to_h,
               most_depleted: most_depleted&.to_h,
-              hourglasses: @hourglasses.values.map(&:to_h)
+              hourglasses:   @hourglasses.values.map(&:to_h)
             }
           end
         end

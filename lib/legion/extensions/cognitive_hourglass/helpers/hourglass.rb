@@ -10,10 +10,7 @@ module Legion
 
           def initialize(domain: nil, grain_type: :attention, top_level: 1.0,
                          neck_width: 0.5, bottom_level: 0.0)
-            raise ArgumentError, "unknown grain_type: #{grain_type}" unless Constants::GRAIN_TYPES.include?(grain_type.to_sym)
-            raise ArgumentError, 'top_level must be between 0.0 and 1.0' unless (0.0..1.0).cover?(top_level.to_f)
-            raise ArgumentError, 'bottom_level must be between 0.0 and 1.0' unless (0.0..1.0).cover?(bottom_level.to_f)
-            raise ArgumentError, 'neck_width must be between 0.0 and 1.0' unless (0.0..1.0).cover?(neck_width.to_f)
+            validate_args!(grain_type, top_level, bottom_level, neck_width)
 
             @id           = SecureRandom.uuid
             @domain       = domain&.to_s
@@ -21,9 +18,9 @@ module Legion
             @top_level    = top_level.to_f.clamp(0.0, 1.0).round(10)
             @bottom_level = bottom_level.to_f.clamp(0.0, 1.0).round(10)
             @neck_width   = neck_width.to_f.clamp(0.0, 1.0).round(10)
-            @state        = :full
             @created_at   = Time.now.utc
             @flipped_at   = nil
+            @state        = derive_state
           end
 
           # Advance one flow tick — sand moves from top to bottom through the neck
@@ -88,23 +85,30 @@ module Legion
 
           def to_h
             {
-              id:           @id,
-              domain:       @domain,
-              grain_type:   @grain_type,
-              top_level:    @top_level,
-              bottom_level: @bottom_level,
-              neck_width:   @neck_width,
-              state:        @state,
-              expired:      expired?,
-              fresh:        fresh?,
-              urgency_label: urgency_label,
+              id:             @id,
+              domain:         @domain,
+              grain_type:     @grain_type,
+              top_level:      @top_level,
+              bottom_level:   @bottom_level,
+              neck_width:     @neck_width,
+              state:          @state,
+              expired:        expired?,
+              fresh:          fresh?,
+              urgency_label:  urgency_label,
               fullness_label: fullness_label,
-              created_at:   @created_at,
-              flipped_at:   @flipped_at
+              created_at:     @created_at,
+              flipped_at:     @flipped_at
             }
           end
 
           private
+
+          def validate_args!(grain_type, top_level, bottom_level, neck_width)
+            raise ArgumentError, "unknown grain_type: #{grain_type}" unless Constants::GRAIN_TYPES.include?(grain_type.to_sym)
+            raise ArgumentError, 'top_level must be between 0.0 and 1.0' unless (0.0..1.0).cover?(top_level.to_f)
+            raise ArgumentError, 'bottom_level must be between 0.0 and 1.0' unless (0.0..1.0).cover?(bottom_level.to_f)
+            raise ArgumentError, 'neck_width must be between 0.0 and 1.0' unless (0.0..1.0).cover?(neck_width.to_f)
+          end
 
           def derive_state
             return :empty  if @top_level <= 0.0

@@ -243,8 +243,8 @@ RSpec.describe Legion::Extensions::CognitiveHourglass::Helpers::Hourglass do
     it 'returns a hash with all expected keys' do
       h = hourglass.to_h
       expect(h.keys).to include(:id, :domain, :grain_type, :top_level, :bottom_level,
-                                 :neck_width, :state, :expired, :fresh,
-                                 :urgency_label, :fullness_label, :created_at, :flipped_at)
+                                :neck_width, :state, :expired, :fresh,
+                                :urgency_label, :fullness_label, :created_at, :flipped_at)
     end
 
     it 'expired key reflects expired? state' do

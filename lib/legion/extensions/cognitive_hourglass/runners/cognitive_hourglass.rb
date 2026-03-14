@@ -44,7 +44,7 @@ module Legion
             { success: false, error: e.message }
           end
 
-          def flow_tick(rate: Constants::FLOW_RATE, engine: nil, **)
+          def flow_tick(rate: Helpers::Constants::FLOW_RATE, engine: nil, **)
             eng    = engine || hourglass_engine
             result = eng.flow_tick(rate.to_f)
             Legion::Logging.debug "[cognitive_hourglass] flow_tick: ticked=#{result[:ticked]} " \

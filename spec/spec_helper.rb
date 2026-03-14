@@ -9,9 +9,16 @@ module Legion
     def self.warn(_msg); end
     def self.error(_msg); end
   end
+
+  module Extensions
+    module Helpers
+      module Lex; end
+    end
+  end
 end
 
 require 'legion/extensions/cognitive_hourglass'
+require 'legion/extensions/cognitive_hourglass/client'
 
 RSpec.configure do |config|
   config.example_status_persistence_file_path = '.rspec_status'
